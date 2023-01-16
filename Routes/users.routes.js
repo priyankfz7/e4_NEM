@@ -2,6 +2,7 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const { UserModel } = require("../Models/user.model");
 const userRouter = express.Router();
+const jwt = require("jsonwebtoken");
 
 userRouter.post("/register", (req, res) => {
   const data = req.body;
@@ -22,6 +23,28 @@ userRouter.post("/register", (req, res) => {
       }
     }
   });
+});
+
+userRouter.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const user = await UserModel.find({ email });
+    if (user.length > 0) {
+      bcrypt.compare(password, user[0].password, (err, result) => {
+        if (result) {
+          const token = jwt.sign({ userID: user[0]._id }, "priyank");
+          res.send({ msg: "login successfull", token: token });
+        } else {
+          res.send({ msg: "Invalid Credentials" });
+        }
+      });
+    } else {
+      res.send({ msg: "User Not Found" });
+    }
+  } catch (e) {
+    console.log(err);
+    res.send({ msg: "Something went wrong" });
+  }
 });
 
 module.exports = { userRouter };

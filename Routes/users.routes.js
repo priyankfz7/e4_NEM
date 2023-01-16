@@ -9,6 +9,7 @@ userRouter.post("/register", (req, res) => {
   bcrypt.hash(data.password, 10, async (err, hash) => {
     if (err) {
       console.log(err);
+      res.status(401);
       res.send({ msg: "Something went wrong" });
     } else {
       const user = new UserModel({ ...data, password: hash });
@@ -19,6 +20,7 @@ userRouter.post("/register", (req, res) => {
         });
       } catch (err) {
         console.log(err);
+        res.status(401);
         res.send({ msg: "Something went wrong" });
       }
     }
@@ -35,14 +37,17 @@ userRouter.post("/login", async (req, res) => {
           const token = jwt.sign({ userID: user[0]._id }, "priyank");
           res.send({ msg: "login successfull", token: token });
         } else {
+          res.status(401);
           res.send({ msg: "Invalid Credentials" });
         }
       });
     } else {
+      res.status(401);
       res.send({ msg: "User Not Found" });
     }
   } catch (e) {
     console.log(err);
+    res.status(401);
     res.send({ msg: "Something went wrong" });
   }
 });

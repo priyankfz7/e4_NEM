@@ -1,3 +1,4 @@
+const e = require("express");
 const express = require("express");
 const { PostModel } = require("../Models/post.model");
 
@@ -20,6 +21,43 @@ postRouter.post("/create", async (req, res) => {
     await post.save();
     res.send({ msg: "post has been created" });
   } catch (e) {
+    console.log(e);
+    res.send({ msg: "Something went Wrong" });
+  }
+});
+
+postRouter.delete("/:id", async (req, res) => {
+  const { id } = req.params;
+  const { userID } = req.body;
+  try {
+    const post = await PostModel.findById(id);
+    if (post.userID == userID) {
+      await PostModel.findByIdAndDelete(id);
+      res.send({ msg: "User has baan deleted" });
+    } else {
+      res.status(401);
+      res.send({ msg: "User not matched" });
+    }
+  } catch (err) {
+    console.log(e);
+    res.send({ msg: "Something went Wrong" });
+  }
+});
+
+postRouter.patch("/:id", async (req, res) => {
+  const { id } = req.params;
+  const { userID } = req.body;
+  const data = req.body;
+  try {
+    const post = await PostModel.findById(id);
+    if (post.userID == userID) {
+      await PostModel.findByIdAndUpdate(id, { ...data });
+      res.send({ msg: "User has baan updated" });
+    } else {
+      res.status(401);
+      res.send({ msg: "User not matched" });
+    }
+  } catch (err) {
     console.log(e);
     res.send({ msg: "Something went Wrong" });
   }
